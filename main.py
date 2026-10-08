@@ -32,3 +32,35 @@ def get_todos(first_n: int = None):
         return all_todos[:first_n]
     else:
         return all_todos
+
+# The todo: dict comes as part of the body- now we don't have a front end, so it'll come form the swagger ui
+@api.post('/todos')
+def create_todo(todo: dict):
+    new_todo_id = max(todo["todo_id"] for todo in all_todos) + 1
+    new_todo = {
+        "todo_id":new_todo_id,
+        "todo_name": todo['todo_name'],
+        "todo_description": todo['todo_description']
+    }
+    all_todos.append(new_todo)
+
+    return new_todo
+
+# The updated_todo will come as part of the body - need to do this through logger
+@api.put('/todos/{todo-id}')
+def update_todo(todo_id: int, updated_todo: dict):
+    for i in all_todos:
+        if i['todo_id'] == todo_id:
+            i['todo_name'] = updated_todo['todo_name']
+            i['todo_description'] = updated_todo['todo_description']
+            return i
+    return "Error, not found"
+
+# Need to do through logger because we need to provide the delete method
+@api.delete('/todos/{todo-id}')
+def delete_todo(todo_id: int):
+    for h, i in enumerate(all_todos):
+        if todo_id == i['todo_id']:
+            return all_todos.pop(h)
+
+    return "Error, not found"
